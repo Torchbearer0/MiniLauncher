@@ -16,10 +16,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Install Gradle (apt)
+      - name: Install SDKMAN and Gradle
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradle 8.6.1
+          echo "$HOME/.sdkman/candidates/gradle/current/bin" >> $GITHUB_PATH
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon
       - name: Upload APK
