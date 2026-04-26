@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK without wrapper
 on:
   push:
     branches: [ main ]
@@ -14,19 +14,15 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Install Gradle
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://services.gradle.org/distributions/gradle-8.4.1-bin.zip -O gradle.zip
+          unzip gradle.zip -d $HOME/gradle
+          echo "$HOME/gradle/gradle-8.4.1/bin" >> $GITHUB_PATH
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
